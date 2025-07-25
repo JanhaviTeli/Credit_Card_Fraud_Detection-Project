@@ -1,0 +1,42 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+import xgboost as xgb
+from sklearn.metrics import accuracy_score
+import pickle
+
+# Step 1: Load dataset
+df = pd.read_csv("merchant_fraud_dataset.csv")
+
+# Step 2: Encode categorical features
+categorical_cols = ['merchant_id', 'suspicious_activity_flag', 'business_category', 'country']
+for col in categorical_cols:
+    if col in df.columns:
+        le = LabelEncoder()
+        df[col] = le.fit_transform(df[col])
+
+# Step 3: Split into features (X) and target (y)
+if 'is_fraud' not in df.columns:
+    raise ValueError("'is_fraud' column not found in dataset.")
+
+X = df.drop(columns=['is_fraud'])
+y = df['is_fraud']
+
+# Step 4: Train-test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Step 5: Train XGBoost model
+model = xgb.XGBClassifier(use_label_encoder=False, eval_metric='logloss')
+model.fit(X_train, y_train)
+
+# Step 6: Evaluate model
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Model Accuracy: {accuracy:.2f}")
+
+# Step 7: Save the model
+with open('fraud_detection_model.pkl', 'wb') as f:
+    pickle.dump(model, f)
+
+print("Model saved to fraud_detection_model.pkl")
+

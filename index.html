@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merchant Validation</title>
+    <script>
+        function checkMerchant() {
+            const merchantID = document.getElementById("merchant_id").value;
+
+            // Sending GET request with query parameters
+            fetch(`http://127.0.0.1:5000/check_merchant?merchant_id=${merchantID}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.valid !== undefined) {
+                        alert(data.valid ? "Merchant is valid!" : "Merchant is invalid.");
+                    } else {
+                        alert(data.error || "Unknown error occurred");
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</head>
+<body>
+    <h1>Check Merchant Validity</h1>
+    <label for="merchant_id">Enter Merchant ID:</label>
+    <input type="text" id="merchant_id" name="merchant_id" required>
+    <button onclick="checkMerchant()">Check Merchant</button>
+</body>
+</html>
